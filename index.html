@@ -157,6 +157,17 @@
   }
   .nav-cta:hover{ background:var(--gold-light); }
   .nav-cta::after{ display:none; }
+  .nav-toggle{
+    display:none; flex-direction:column; justify-content:center; gap:5px;
+    width:38px; height:38px; background:transparent; border:1px solid var(--line);
+    cursor:pointer; padding:0; align-items:center;
+  }
+  .nav-toggle span{
+    width:18px; height:1.5px; background:var(--gold-light); transition:transform 0.3s ease, opacity 0.3s ease;
+  }
+  .nav-toggle.open span:nth-child(1){ transform:translateY(6.5px) rotate(45deg); }
+  .nav-toggle.open span:nth-child(2){ opacity:0; }
+  .nav-toggle.open span:nth-child(3){ transform:translateY(-6.5px) rotate(-45deg); }
 
   /* ---------------- HERO ---------------- */
   .hero{
@@ -383,18 +394,58 @@
   }
 
   @media (max-width: 880px){
-    nav ul{ gap:20px; }
-    nav ul li:not(:last-child){ display:none; }
+    header{ padding:18px 6vw; }
+    .nav-toggle{ display:flex; }
+    nav{ position:fixed; top:0; left:0; right:0; z-index:499; }
+    nav ul{
+      position:fixed; top:0; right:0; height:100vh; width:min(78vw, 320px);
+      flex-direction:column; align-items:flex-start; justify-content:center;
+      gap:28px; padding:100px 36px 40px;
+      background:linear-gradient(180deg, #17110a, #0b0906);
+      border-left:1px solid var(--line);
+      transform:translateX(100%); transition:transform 0.4s ease;
+    }
+    nav ul.open{ transform:translateX(0); }
+    nav ul li{ width:100%; }
+    nav a{ font-size:0.95rem; }
+    .nav-cta{ display:inline-block; margin-top:10px; }
+    .hero{ padding:120px 6vw 60px; min-height:88vh; }
+    .hero-actions{ flex-direction:column; align-items:stretch; }
+    .hero-actions .btn{ text-align:center; }
+    section{ padding:70px 6vw; }
+    .section-head{ margin-bottom:40px; }
+    .gate-card{ padding:40px 26px 32px; }
+    .gate-buttons{ flex-direction:column; }
+    .gate-buttons .btn{ width:100%; }
     .cat-grid{ grid-template-columns:1fr; }
     .bulk-grid{ grid-template-columns:1fr; }
+    .bulk-cta .btn{ width:100%; max-width:320px; }
     .reserve-grid{ grid-template-columns:1fr; }
+    .price-row{ flex-wrap:wrap; gap:10px; }
+    .price-row .btn{ width:100%; text-align:center; }
     .vault{ grid-template-columns:1fr; gap:36px; }
     .visit-grid{ grid-template-columns:1fr; }
-    .visit-cell{ border-left:none; border-top:1px solid var(--line); }
+    .visit-cell{ border-left:none; border-top:1px solid var(--line); padding:30px 20px; }
     .visit-cell:first-child{ border-top:none; }
-    .foot-grid{ grid-template-columns:1fr 1fr; }
+    .order-band .btn{ width:100%; max-width:320px; }
+    .foot-grid{ grid-template-columns:1fr 1fr; gap:30px 20px; }
+    .foot-bottom{ flex-direction:column; text-align:center; }
     .form-row{ grid-template-columns:1fr; }
     .contact-form{ padding:34px 24px; }
+    .news-form{ flex-direction:column; max-width:100%; }
+    .news-form input{ border-right:1px solid var(--line); }
+    .news-form button{ padding:13px; }
+  }
+
+  @media (max-width: 480px){
+    .gate-card h1{ font-size:1.7rem; }
+    .logo .word{ font-size:1.05rem; }
+    .logo svg{ width:28px; height:28px; }
+    .hero h1{ font-size:clamp(2.3rem, 9vw, 3rem); }
+    .hero p.lead{ font-size:1rem; }
+    .foot-grid{ grid-template-columns:1fr; }
+    .cat-photo{ height:150px; }
+    .bottle-photo{ height:200px; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -435,7 +486,7 @@
     <span class="word">KING <span>LIQUOR</span></span>
   </a>
   <nav>
-    <ul>
+    <ul id="navList">
       <li><a href="#categories">Collection</a></li>
       <li><a href="#reserve">Reserve</a></li>
       <li><a href="#vault">The Vault</a></li>
@@ -444,6 +495,9 @@
       <li><a href="tel:19094890209" class="nav-cta">Call Now to Order</a></li>
     </ul>
   </nav>
+  <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </header>
 
 <!-- ================= HERO ================= -->
@@ -753,6 +807,29 @@
   btnNo.addEventListener('click', function(){
     deniedMsg.classList.add('show');
     document.querySelector('.gate-buttons').style.display = 'none';
+  });
+
+  // ---- Mobile nav toggle ----
+  var navToggle = document.getElementById('navToggle');
+  var navList = document.getElementById('navList');
+  navToggle.addEventListener('click', function(){
+    var isOpen = navList.classList.toggle('open');
+    navToggle.classList.toggle('open', isOpen);
+    navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+  navList.querySelectorAll('a').forEach(function(link){
+    link.addEventListener('click', function(){
+      navList.classList.remove('open');
+      navToggle.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+  document.addEventListener('click', function(e){
+    if(navList.classList.contains('open') && !navList.contains(e.target) && !navToggle.contains(e.target)){
+      navList.classList.remove('open');
+      navToggle.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    }
   });
 
   // ---- Scroll reveal ----
